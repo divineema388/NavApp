@@ -2,11 +2,11 @@ package com.nav.bnu;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.*;
-import android.util.Log; // Standard Android logging, can be kept or removed if not used
-import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 import com.nav.bnu.databinding.ActivityMainBinding;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.drawerlayout.widget.DrawerLayout; // Good to have for clarity if casting
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,41 +14,30 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // LogSender.startLogging(this); // REMOVE THIS LINE
         super.onCreate(savedInstanceState);
-        // Inflate and get instance of binding
         binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-        setSupportActionBar(binding.toolbar);
+        setContentView(binding.getRoot()); // The root is your DrawerLayout
+        setSupportActionBar(binding.toolbar); // Your toolbar
 
-        // Ensure binding.getRoot() is the DrawerLayout if you are using a NavigationView
-        // If binding.getRoot() is not the DrawerLayout, you need to pass the correct DrawerLayout instance.
-        // For example, if your DrawerLayout has an id like 'drawer_layout':
-        // ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.app_name, R.string.app_name);
-        // binding.drawerLayout.setDrawerListener(toggle);
-
-        // Assuming binding.getRoot() IS the DrawerLayout as per original code structure
-        // If your root layout in activity_main.xml is not a DrawerLayout, this will cause issues.
-        // Let's assume for now it is a DrawerLayout as the code implies.
+        // binding.getRoot() is the DrawerLayout instance from your XML
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this,
-                binding.getRoot(), // This should be your DrawerLayout
+                (DrawerLayout) binding.getRoot(), // Explicitly cast for clarity, or rely on the 'if' block
                 binding.toolbar,
                 R.string.app_name, // Open drawer description
-                R.string.app_name  // Close drawer description (you might want a different string here)
+                R.string.app_name  // Close drawer description (consider R.string.navigation_drawer_open/close)
         );
 
-        // If binding.getRoot() is indeed a DrawerLayout, you can cast it
+        // The 'if' block from the previous example is robust:
         if (binding.getRoot() instanceof androidx.drawerlayout.widget.DrawerLayout) {
-            androidx.drawerlayout.widget.DrawerLayout drawer = (androidx.drawerlayout.widget.DrawerLayout) binding.getRoot();
-            drawer.addDrawerListener(toggle); // Use addDrawerListener instead of setDrawerListener
+            DrawerLayout drawer = (DrawerLayout) binding.getRoot();
+            drawer.addDrawerListener(toggle);
         } else {
-            // Log a warning or handle the case where the root is not a DrawerLayout
+            // This branch should not be hit with your current XML
             Log.w("MainActivity", "Root view is not a DrawerLayout. Navigation drawer toggle might not work as expected.");
         }
         toggle.syncState();
 
-        // Use lambdas
         binding.fab.setOnClickListener(v -> Toast.makeText(MainActivity.this, "Replace with your action", Toast.LENGTH_SHORT).show());
     }
 }
