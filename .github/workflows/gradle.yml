@@ -1,1 +1,40 @@
+name: Android CI Build - Navapp
 
+on:
+  push:
+    branches: [ master, main ] # Triggers on push to master or main branch
+  pull_request:
+    branches: [ master, main ] # Triggers on pull requests to master or main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin' # Using Temurin distribution of OpenJDK
+        cache: 'gradle' # Cache Gradle dependencies for faster builds
+
+    - name: Grant gradlew execute permission
+      # The gradlew file might not have execute permissions when checked out on the runner
+      run: chmod +x ./gradlew
+      # This command assumes gradlew is at the root of your repository (Navapp directory)
+
+    - name: Build debug APK with Gradle
+      # This runs the assembleDebug Gradle task, which builds the debug APK
+      # It assumes gradlew is at the root of your repository (Navapp directory)
+      run: ./gradlew assembleDebug
+
+    - name: Upload Debug APK
+      # This step uploads the built APK as an artifact, so you can download it
+      uses: actions/upload-artifact@v4
+      with:
+        name: Navapp-debug-apk # Name of the artifact that will be uploaded
+        path: app/build/outputs/apk/debug/app-debug.apk # Path to the APK file
+        if-no-files-found: error # Fail the workflow if the APK is not found
